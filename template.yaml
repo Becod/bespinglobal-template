@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Metadata:
+  License: Apache-2.0
+Description: 'Bespin Global Support & Opsnow'
+Parameters:
+  Password:
+    NoEcho: 'true'
+    Type: String
+    Description: New account password
+    MinLength: '1'
+    MaxLength: '41'
+    ConstraintDescription: the password must be between 1 and 41 characters
+Resources:
+  BespinSupport:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: "BespinSupport"
+      LoginProfile:
+        Password: !Ref 'Password'
+        PasswordResetRequired: true
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/ReadOnlyAccess
+        - arn:aws:iam::aws:policy/AWSSupportAccess
+        - arn:aws:iam::aws:policy/job-function/SupportUser
+        - arn:aws:iam::aws:policy/job-function/Billing
+        - arn:aws:iam::aws:policy/AWSOrganizationsFullAccess
+
+  BespinOpsnow:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: "BespinOpsnow"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/ReadOnlyAccess
+  BespinOpsnowKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref 'BespinOpsnow'
+
+Outputs:
+  AccountId:
+    Value: !Ref AWS::AccountId
+  BespinSupportLoginURL:
+    Value: !Join ["", ["https://", !Ref AWS::AccountId , ".signin.aws.amazon.com/console"]]
+  BespinSupportPassword:
+    Value: !Ref 'Password'
+    Description: Temporary Password of new user
+  BespinOpsnowAccessKey:
+    Value: !Ref 'BespinOpsnowKey'
+    Description: AWSAccessKeyId of new user
+  BespinOpsnowSecretKey:
+    Value: !GetAtt [BespinOpsnowKey, SecretAccessKey]
+    Description: AWSSecretAccessKey of new user
