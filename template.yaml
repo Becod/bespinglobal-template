@@ -24,6 +24,17 @@ Resources:
         - arn:aws:iam::aws:policy/job-function/SupportUser
         - arn:aws:iam::aws:policy/job-function/Billing
         - arn:aws:iam::aws:policy/AWSOrganizationsFullAccess
+      Policies:
+        - PolicyName: ChangePasswordPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: iam:GetAccountPasswordPolicy
+                Resource: "*"
+              - Effect: Allow
+                Action: iam:ChangePassword
+                Resource: !Join ["", ["arn:aws:iam::", !Ref AWS::AccountId, ":user/", "BespinSupport"]]
 
   BespinOpsnow:
     Type: AWS::IAM::User
